@@ -41,15 +41,7 @@ public class BotApi extends TelegramLongPollingBot {
 
     private void answerTest(Message message) {
         if (getTxtCap(message).equals("testbot")) {
-            try {
-                SendMessage sendMessage = new SendMessage();
-                sendMessage.setReplyToMessageId(message.getMessageId());
-                sendMessage.setText("working");
-                sendMessage.setChatId(message.getChatId());
-                sendMessage(sendMessage);
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
+            sendTextMessage("working", message.getChatId());
         }
     }
 
@@ -173,7 +165,7 @@ public class BotApi extends TelegramLongPollingBot {
         }
     }
 
-    private void sendTextMessage(String text, Long chatId) {
+    public void sendTextMessage(String text, Long chatId) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setText(text);
         sendMessage.setChatId(chatId);
@@ -190,7 +182,7 @@ public class BotApi extends TelegramLongPollingBot {
 
     @Override
     public String getBotToken() {
-        System.out.println("tokening");
+//        System.out.println("tokening");
         return Secrets.getToken();
     }
 

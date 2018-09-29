@@ -4,7 +4,11 @@ import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
+import java.io.PrintStream;
+
 public class Main {
+    static PrintStream mainPrintStream;
+    static BotApi botApi;
     public static void main(String[] args) {
         // Setting proxies
 //        System.out.println("http has been set");
@@ -13,10 +17,12 @@ public class Main {
 //        System.out.println("https has been set");
 //        System.setProperty("https.proxyHost", "localhost");
 //        System.setProperty("https.proxyPort", "8580");
-//        System.out.println("socks has been set");
-//        System.setProperty("socksProxyHost", "localhost");
-//        System.setProperty("socksProxyPort", "9150");
+        System.out.println("socks has been set");
+        System.setProperty("socksProxyHost", "localhost");
+        System.setProperty("socksProxyPort", "9150");
 
+        mainPrintStream = System.out;
+        System.setOut(new TelegramPrintStream(new TelegramOutputStream()));
         // Initialize Api Context
         ApiContextInitializer.init();
 
@@ -25,7 +31,8 @@ public class Main {
         System.out.println("bot created");
         // Register our bot
         try {
-            botsApi.registerBot(new BotApi());
+            botApi = new BotApi();
+            botsApi.registerBot(botApi);
             System.out.println("bot registered");
         } catch (TelegramApiException e) {
             System.out.println("failed register");
