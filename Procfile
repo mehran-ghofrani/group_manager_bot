@@ -1,1 +1,1 @@
-web: java -jar target/test-1.0-jar-with-dependencies.jar
+web: java agentlib:jdwp=transport=dt_socket,server=y,address=9090,suspend=n -jar target/test-1.0-jar-with-dependencies.jar

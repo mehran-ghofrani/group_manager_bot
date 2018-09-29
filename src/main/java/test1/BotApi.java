@@ -1,5 +1,6 @@
 package test1;
 
+import com.sun.org.apache.xml.internal.dtm.ref.ExtendedType;
 import org.telegram.telegrambots.api.methods.groupadministration.GetChatAdministrators;
 import org.telegram.telegrambots.api.methods.groupadministration.GetChatMemberCount;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
@@ -21,118 +22,144 @@ public class BotApi extends TelegramLongPollingBot {
 
     public void onUpdateReceived(Update update) {
         System.out.println("update recived");
-        if (update.hasMessage() && update.getMessage().hasText()) { //start logic
+        if (update.hasMessage()) {
+            //start logic
             Message message = update.getMessage();
-            String messageText = message.getText();
-            if (messageText.startsWith("setlimit")) {
-                setLimit(message);
-            }
-            if (messageText.equals("warn")) {
-                warn(message);
-            }
+            answerTest(message);
+            setLimit(message);
+            warn(message);
             checkLinks(message);
-//            sendTextMessage("test47", message.getChatId());
+            checkForward(message);
+        }
+    }
+
+    private void checkForward(Message message) {
+        if (message.getForwardFromChat() != null) {
+            deleteMessage(message);
+        }
+    }
+
+    private void answerTest(Message message) {
+        if (getTxtCap(message).equals("testbot")) {
+            try {
+                SendMessage sendMessage = new SendMessage();
+                sendMessage.setReplyToMessageId(message.getMessageId());
+                sendMessage.setText("working");
+                sendMessage.setChatId(message.getChatId());
+                sendMessage(sendMessage);
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private String getTxtCap(Message message) {
+        if (message.getText() != null) {
+            return message.getText();
+        }
+        else {
+            return message.getCaption();
         }
     }
 
     private void checkLinks(Message message) {
         Pattern urlPattern = Pattern.compile(
-                "(?:^|[\\W])((ht|f)tp(s?):\\/\\/|www\\.)"
-                        + "(([\\w\\-]+\\.){1,}?([\\w\\-.~]+\\/?)*"
-                        + "[\\p{Alnum}.,%_=?&#\\-+()\\[\\]\\*$~@!:/{};']*)",
+                ".*[.].*[/]",
                 Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
-        Matcher matcher = urlPattern.matcher(message.getText());
+        Matcher matcher = urlPattern.matcher(getTxtCap(message));
         if (matcher.find())
             deleteMessage(message);
     }
 
     private void setLimit(Message message) {
-
-        GetChatAdministrators getChatAdministrators = new GetChatAdministrators();
-        getChatAdministrators.setChatId(message.getChatId());
-        List<ChatMember> administrators = null;
-        try {
-            administrators = execute(getChatAdministrators);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
-        boolean nonAdminFlag = true;
-        for (ChatMember chatMember : administrators) {
-            if (chatMember.getUser().getId().equals(message.getFrom().getId())) {
-                nonAdminFlag = false;
-                break;
-            }
-        }
-        if (!nonAdminFlag) {
+        if (getTxtCap(message).startsWith("setlimit")) {
+            GetChatAdministrators getChatAdministrators = new GetChatAdministrators();
+            getChatAdministrators.setChatId(message.getChatId());
+            List<ChatMember> administrators = null;
             try {
-                int limit = Integer.valueOf(message.getText().substring(9));
-                if (limit >= 0 && limit <= 100) {
-                    warnLimitByGroup.put(message.getChatId(), limit);
-                    int chatMemberCount = 0;
-                    GetChatMemberCount getChatMemberCount = new GetChatMemberCount();
-                    getChatMemberCount.setChatId(message.getChatId());
-                    try {
-                        chatMemberCount = execute(getChatMemberCount);
-                    } catch (TelegramApiException e) {
-                        e.printStackTrace();
-                    }
-                    sendTextMessage("from now, " + (int)Math.ceil(((double)limit * chatMemberCount) / 100) + " warnings(more than " + limit + "% of members count) are needed to delete a warned message.",
-                            message.getChatId());
-                } else {
-                    sendTextMessage("invalid argument", message.getChatId());
-                }
-            } catch (Exception ex) {
-                sendTextMessage("illegal argument...\nsetlimit [0-100]",
-                        message.getChatId());
-            }
-        }
-
-    }
-
-    private void warn(Message message) {
-        Message warnedMessage = message.getReplyToMessage();
-        long chatId = message.getChat().getId();
-        Integer warnedMessageId = warnedMessage.getMessageId();
-        int warnerId = message.getFrom().getId();
-        String warnedMessageEntityId = String.valueOf(warnedMessage) + String.valueOf(warnedMessageId);
-        WarnedMessageEntity warnedMessageEntity;
-        List<Integer> warnerIds = null;
-        if(warnedMessagesByChatMessageId.get(warnedMessageEntityId) == null) {
-            warnedMessageEntity = new WarnedMessageEntity();
-            warnedMessageEntity.setChatId(chatId);
-            warnedMessageEntity.setMessageId(warnedMessageId);
-            warnedMessagesByChatMessageId.put(warnedMessageEntityId, warnedMessageEntity);
-            warnerIds = warnedMessageEntity.getWarnerIds();
-        } else {
-            warnedMessageEntity = warnedMessagesByChatMessageId.get(warnedMessageEntityId);
-            warnerIds = warnedMessageEntity.getWarnerIds();
-        }
-        Boolean duplicatedWarnFlag = false;
-        for (Integer WId : warnerIds) {
-            if (WId.equals(warnerId)) {
-                duplicatedWarnFlag = true;
-                break;
-            }
-        }
-        if (!duplicatedWarnFlag) {
-            warnerIds.add(warnerId);
-            if (warnLimitByGroup.get(chatId) == null) {
-                warnLimitByGroup.put(chatId, 25);
-            }
-            int chatMemberCount = 0;
-            GetChatMemberCount getChatMemberCount = new GetChatMemberCount();
-            getChatMemberCount.setChatId(chatId);
-            try {
-                chatMemberCount = execute(getChatMemberCount);
+                administrators = execute(getChatAdministrators);
             } catch (TelegramApiException e) {
                 e.printStackTrace();
             }
-
-            if (warnerIds.size() >= (int)Math.ceil(((double)warnLimitByGroup.get(chatId) * chatMemberCount) / 100)) {
-                deleteMessage(warnedMessage);
+            boolean nonAdminFlag = true;
+            for (ChatMember chatMember : administrators) {
+                if (chatMember.getUser().getId().equals(message.getFrom().getId())) {
+                    nonAdminFlag = false;
+                    break;
+                }
+            }
+            if (!nonAdminFlag) {
+                try {
+                    int limit = Integer.valueOf(getTxtCap(message).substring(9));
+                    if (limit >= 0 && limit <= 100) {
+                        warnLimitByGroup.put(message.getChatId(), limit);
+                        int chatMemberCount = 0;
+                        GetChatMemberCount getChatMemberCount = new GetChatMemberCount();
+                        getChatMemberCount.setChatId(message.getChatId());
+                        try {
+                            chatMemberCount = execute(getChatMemberCount);
+                        } catch (TelegramApiException e) {
+                            e.printStackTrace();
+                        }
+                        sendTextMessage("from now, " + (int) Math.ceil(((double) limit * chatMemberCount) / 100) + " warnings(more than " + limit + "% of members count) are needed to delete a warned message.",
+                                message.getChatId());
+                    } else {
+                        sendTextMessage("invalid argument", message.getChatId());
+                    }
+                } catch (Exception ex) {
+                    sendTextMessage("illegal argument...\nsetlimit [0-100]",
+                            message.getChatId());
+                }
             }
         }
-        deleteMessage(message);
+    }
+
+    private void warn(Message message) {
+        if (getTxtCap(message).equals("warn") && (message.getReplyToMessage() != null)) {
+            Message warnedMessage = message.getReplyToMessage();
+            long chatId = message.getChat().getId();
+            Integer warnedMessageId = warnedMessage.getMessageId();
+            int warnerId = message.getFrom().getId();
+            String warnedMessageEntityId = String.valueOf(warnedMessage) + String.valueOf(warnedMessageId);
+            WarnedMessageEntity warnedMessageEntity;
+            List<Integer> warnerIds = null;
+            if (warnedMessagesByChatMessageId.get(warnedMessageEntityId) == null) {
+                warnedMessageEntity = new WarnedMessageEntity();
+                warnedMessageEntity.setChatId(chatId);
+                warnedMessageEntity.setMessageId(warnedMessageId);
+                warnedMessagesByChatMessageId.put(warnedMessageEntityId, warnedMessageEntity);
+                warnerIds = warnedMessageEntity.getWarnerIds();
+            } else {
+                warnedMessageEntity = warnedMessagesByChatMessageId.get(warnedMessageEntityId);
+                warnerIds = warnedMessageEntity.getWarnerIds();
+            }
+            Boolean duplicatedWarnFlag = false;
+            for (Integer WId : warnerIds) {
+                if (WId.equals(warnerId)) {
+                    duplicatedWarnFlag = true;
+                    break;
+                }
+            }
+            if (!duplicatedWarnFlag) {
+                warnerIds.add(warnerId);
+                if (warnLimitByGroup.get(chatId) == null) {
+                    warnLimitByGroup.put(chatId, 25);
+                }
+                int chatMemberCount = 0;
+                GetChatMemberCount getChatMemberCount = new GetChatMemberCount();
+                getChatMemberCount.setChatId(chatId);
+                try {
+                    chatMemberCount = execute(getChatMemberCount);
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
+
+                if (warnerIds.size() >= (int) Math.ceil(((double) warnLimitByGroup.get(chatId) * chatMemberCount) / 100)) {
+                    deleteMessage(warnedMessage);
+                }
+            }
+            deleteMessage(message);
+        }
     }
 
     private void deleteMessage(Message message) {
@@ -158,11 +185,12 @@ public class BotApi extends TelegramLongPollingBot {
     }
 
     public String getBotUsername() {
-        return "testPHPmghbot";
+        return "PersianGroupGuard_Bot";
     }
 
     @Override
     public String getBotToken() {
+        System.out.println("tokening");
         return Secrets.getToken();
     }
 
