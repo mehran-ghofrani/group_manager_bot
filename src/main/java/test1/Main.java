@@ -27,7 +27,7 @@ public class Main {
 
             //binding a port to avoid heroku bind timeout
             Socket s = new Socket();
-            int portNum = Integer.getInteger(System.getenv("PORT"));
+            int portNum = Integer.valueOf(System.getenv("PORT"));
             InetSocketAddress inetSocketAddress = new InetSocketAddress("0.0.0.0", portNum);
             s.bind(inetSocketAddress);
 //            s.connect(new InetSocketAddress("google.com", 80));
