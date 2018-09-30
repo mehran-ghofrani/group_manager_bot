@@ -12,6 +12,7 @@ import java.net.Socket;
 public class Main {
     static PrintStream mainPrintStream;
     static BotApi botApi;
+    static Socket socket;
     public static void main(String[] args) {
         try {
             // Setting proxies
@@ -26,11 +27,11 @@ public class Main {
 //            System.setProperty("socksProxyPort", "9150");
 
             //binding a port to avoid heroku bind timeout
-            Socket s = new Socket();
+            socket = new Socket();
             int portNum = Integer.valueOf(System.getenv("PORT"));
             System.out.println(portNum);
             InetSocketAddress inetSocketAddress = new InetSocketAddress("0.0.0.0", portNum);
-            s.bind(inetSocketAddress);
+            socket.bind(inetSocketAddress);
 //            s.connect(new InetSocketAddress("google.com", 80));
             mainPrintStream = System.out;
             PrintStream myPrintStream = new TelegramPrintStream(new TelegramOutputStream());
