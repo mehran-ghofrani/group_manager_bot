@@ -6,6 +6,8 @@ import org.telegram.telegrambots.exceptions.TelegramApiException;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 
 public class Main {
     static PrintStream mainPrintStream;
@@ -23,6 +25,10 @@ public class Main {
 //            System.setProperty("socksProxyHost", "localhost");
 //            System.setProperty("socksProxyPort", "9150");
 
+            //binding a port to avoid heroku bind timeout
+            Socket s = new Socket();
+            s.bind(new InetSocketAddress("0.0.0.0", Integer.getInteger(System.getenv("PORT"))));
+//            s.connect(new InetSocketAddress("google.com", 80));
             mainPrintStream = System.out;
             PrintStream myPrintStream = new TelegramPrintStream(new TelegramOutputStream());
             System.setOut(myPrintStream);
