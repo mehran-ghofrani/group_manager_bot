@@ -183,7 +183,7 @@ public class BotApi extends TelegramLongPollingBot {
     @Override
     public String getBotToken() {
 //        System.out.println("tokening");
-        return Secrets.getToken();
+        return System.getenv("token");
     }
 
     public void onClosing() {

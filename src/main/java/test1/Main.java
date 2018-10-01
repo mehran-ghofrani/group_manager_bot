@@ -16,16 +16,11 @@ public class Main {
     public static void main(String[] args) {
         try {
             // Setting proxies
-//        System.out.println("http has been set");
-//        System.setProperty("http.proxyHost", "localhost");
-//        System.setProperty("http.proxyPort", "8580");
-//        System.out.println("https has been set");
-//        System.setProperty("https.proxyHost", "localhost");
-//        System.setProperty("https.proxyPort", "8580");
-//            System.out.println("socks has been set");
-//            System.setProperty("socksProxyHost", "localhost");
-//            System.setProperty("socksProxyPort", "9150");
-
+            if (System.getenv("connect9150").equals("false")) {
+                System.out.println("socks has been set");
+                System.setProperty("socksProxyHost", "localhost");
+                System.setProperty("socksProxyPort", "9150");
+            }
             //binding a port to avoid heroku bind timeout
             socket = new Socket();
             int portNum = Integer.valueOf(System.getenv("PORT"));
