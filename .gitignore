@@ -1,4 +1,3 @@
 target/
 .idea/
 src/main/java/test1/Secrets.java
-!src/main/java/test1/Secrets.java

@@ -47,7 +47,7 @@ public class Main {
             try {
                 botApi = new BotApi();
                 botsApi.registerBot(botApi);
-                System.out.println("bot registered");
+                botApi.sendTextMessage("bot registered", 87654811L);
                 //infinite message to detect how much does the bot survive
                 new Thread(new Runnable() {
                     public void run() {
