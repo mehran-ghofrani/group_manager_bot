@@ -16,7 +16,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             // Setting proxies
-            if (System.getenv("connect9150").equals("false")) {
+            if (!System.getenv("connect9150").equals("false")) {
                 System.out.println("socks has been set");
                 System.setProperty("socksProxyHost", "localhost");
                 System.setProperty("socksProxyPort", "9150");
