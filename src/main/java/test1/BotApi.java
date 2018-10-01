@@ -177,7 +177,7 @@ public class BotApi extends TelegramLongPollingBot {
     }
 
     public String getBotUsername() {
-        return "PersianGroupGuard_Bot";
+        return System.getenv("username");
     }
 
     @Override

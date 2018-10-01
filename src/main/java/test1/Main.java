@@ -48,7 +48,7 @@ public class Main {
                     public void run() {
                         while (true) {
                             try {
-                                Thread.sleep(600000/40);
+                                Thread.sleep(600000);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
