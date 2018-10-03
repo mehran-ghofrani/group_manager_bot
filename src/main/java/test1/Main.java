@@ -10,7 +10,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 
 public class Main {
-    static PrintStream mainPrintStream;
+//    static PrintStream mainPrintStream;
     static BotApi botApi;
     static Socket socket;
     public static void main(String[] args) {
@@ -28,10 +28,10 @@ public class Main {
             InetSocketAddress inetSocketAddress = new InetSocketAddress("0.0.0.0", portNum);
             socket.bind(inetSocketAddress);
 //            s.connect(new InetSocketAddress("google.com", 80));
-            mainPrintStream = System.out;
-            PrintStream myPrintStream = new TelegramPrintStream(new TelegramOutputStream());
-            System.setOut(myPrintStream);
-            System.setErr(myPrintStream);
+//            mainPrintStream = System.out;
+//            PrintStream myPrintStream = new TelegramPrintStream(new TelegramOutputStream());
+//            System.setOut(myPrintStream);
+//            System.setErr(myPrintStream);
             // Initialize Api Context
             ApiContextInitializer.init();
 
