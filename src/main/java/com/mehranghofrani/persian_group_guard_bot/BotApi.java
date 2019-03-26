@@ -4,8 +4,10 @@ import com.ghasemkiani.util.icu.PersianCalendar;
 import com.ibm.icu.util.ULocale;
 import com.mehranghofrani.persian_group_guard_bot.model.dao.AccessibleUserRepository;
 import com.mehranghofrani.persian_group_guard_bot.model.dao.WarnedMessageRepository;
+import com.mehranghofrani.persian_group_guard_bot.model.dao.WarnedUserRepository;
 import com.mehranghofrani.persian_group_guard_bot.model.entity.AccessibleUser;
 import com.mehranghofrani.persian_group_guard_bot.model.entity.WarnedMessage;
+import com.mehranghofrani.persian_group_guard_bot.model.entity.WarnedUser;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.api.methods.groupadministration.GetChat;
@@ -34,6 +36,8 @@ public class BotApi extends TelegramLongPollingBot {
     @Resource
     WarnedMessageRepository warnedMessageRepository;
     @Resource
+    WarnedUserRepository warnedUserRepository;
+    @Resource
     AccessibleUserRepository accessibleUserRepository;
 //    HashMap<String, WarnedMessage> warnedMessagesByChatMessageId = new HashMap();
     HashMap<Long, Integer> warnLimitByGroup = new HashMap<Long, Integer>();
@@ -50,8 +54,31 @@ public class BotApi extends TelegramLongPollingBot {
                 warn(message);
                 checkLinks(message);
                 checkForward(message);
+                answerUnban(message);
+                answerUnbanCount(message);
+
             } catch (TelegramApiException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    private void answerUnbanCount(Message message) {
+        if (message.getText().contains("/unban") && message.getFrom().getId().equals(87654811)) {
+            int userId = Integer.valueOf(getTxtCap(message).substring(6));
+            WarnedUser warnedUser = warnedUserRepository.findByUserId(userId);
+            sendTextMessage(warnedUser.getUnbanCount().toString(), 87654811L, null);
+        }
+    }
+
+    private void answerUnban(Message message) {
+        if (message.getText().contains("/unban") && message.getFrom().getId().equals(87654811)) {
+            int userId = Integer.valueOf(getTxtCap(message).substring(6));
+            WarnedUser warnedUser = warnedUserRepository.findByUserId(userId);
+            if (warnedUser != null) {
+                warnedUser.setWarnsCount(0);
+            } else {
+                sendTextMessage("user not found", 87654811L, null);
             }
         }
     }

@@ -5,5 +5,5 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface WarnedUserRepository extends CrudRepository<WarnedUser, Long> {
 
-    WarnedUser findByUserId(Long userId);
+    WarnedUser findByUserId(Integer userId);
 }

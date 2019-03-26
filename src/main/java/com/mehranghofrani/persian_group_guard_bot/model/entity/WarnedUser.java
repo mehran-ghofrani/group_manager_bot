@@ -16,6 +16,9 @@ public class WarnedUser {
     @Column(name = "warns_count")
     Integer warnsCount;
 
+    @Column(name = "unban_count")
+    Integer unbanCount;
+
     public Integer getUserId() {
         return userId;
     }
@@ -30,5 +33,13 @@ public class WarnedUser {
 
     public void setWarnsCount(Integer warnsCount) {
         this.warnsCount = warnsCount;
+    }
+
+    public Integer getUnbanCount() {
+        return unbanCount;
+    }
+
+    public void setUnbanCount(Integer unbanCount) {
+        this.unbanCount = unbanCount;
     }
 }
