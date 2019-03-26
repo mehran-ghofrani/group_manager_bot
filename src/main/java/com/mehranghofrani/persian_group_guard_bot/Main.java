@@ -12,7 +12,9 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
@@ -84,7 +86,9 @@ public class Main implements ApplicationRunner {
                 System.out.println("failed register");
                 e.printStackTrace();
             }
-        }catch(Exception e){e.printStackTrace();}//to prevent stopping bot on the server
+        } catch (IOException e) {
+            e.printStackTrace();
+        }//to prevent stopping bot on the server
     }
 
     @Override
