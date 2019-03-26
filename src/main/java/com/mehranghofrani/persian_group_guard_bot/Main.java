@@ -68,24 +68,26 @@ public class Main implements ApplicationRunner {
             // Register our bot
             try {
                 botsApi.registerBot(botApi);
-                botApi.sendTextMessage("bot registered", 87654811L, null);
-                //infinite message to detect how much does the bot survive
-                new Thread(new Runnable() {
-                    public void run() {
-                        while (true) {
-                            try {
-                                Thread.sleep(600000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                            botApi.sendTextMessage("I'm still alive...", 87654811L, null);
-                        }
-                    }
-                }).start();
             } catch (TelegramApiException e) {
                 System.out.println("failed register");
                 e.printStackTrace();
+                throw new IOException();
             }
+            botApi.sendTextMessage("bot registered", 87654811L, null);
+            //infinite message to detect how much does the bot survive
+            new Thread(new Runnable() {
+                public void run() {
+                    while (true) {
+                        try {
+                            Thread.sleep(600000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        botApi.sendTextMessage("I'm still alive...", 87654811L, null);
+                    }
+                }
+            }).start();
+
         } catch (IOException e) {
             e.printStackTrace();
         }//to prevent stopping bot on the server
