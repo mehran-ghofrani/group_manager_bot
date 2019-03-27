@@ -231,6 +231,10 @@ public class BotController extends TelegramLongPollingBot {
                 }
 
                 WarnedUser warnedUser = warnedUserService.findByUserId(message.getFrom().getId());
+                if (warnedUser == null) {
+                    warnedUser = new WarnedUser();
+                    warnedUser.setUserId(message.getFrom().getId());
+                }
                 if (warnerIds.size() >= (int) Math.ceil((10d * chatMemberCount) / 100)) {
                     deleteMessage(repliedMessage);
                     String messageText = "این پیام که توسط شما به گروه زیر ارسال شده بود به دلیل اخطار های مکرر کاربران از گروه حذف شد:" + "\r\n"
