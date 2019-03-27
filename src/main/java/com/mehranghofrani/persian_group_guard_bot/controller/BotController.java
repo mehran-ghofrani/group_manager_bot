@@ -90,7 +90,7 @@ public class BotController extends TelegramLongPollingBot {
     }
 
     private void answerUnban(Message message) {
-        if (message.getText().contains("/unban") && message.getFrom().getId().equals(87654811)) {
+        if (message.getText().contains("/unbanUser") && message.getFrom().getId().equals(87654811)) {
             int userId = Integer.valueOf(getTxtCap(message).substring(6));
             WarnedUser warnedUser = warnedUserService.findByUserId(userId);
             if (warnedUser != null) {
