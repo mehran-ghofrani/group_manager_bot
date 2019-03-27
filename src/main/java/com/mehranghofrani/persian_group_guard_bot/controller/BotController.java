@@ -83,7 +83,7 @@ public class BotController extends TelegramLongPollingBot {
 
     private void answerUnbanCount(Message message) {
         if (message.getText().contains("/unbanCount") && message.getFrom().getId().equals(87654811)) {
-            int userId = Integer.valueOf(getTxtCap(message).substring(6));
+            int userId = Integer.valueOf(getTxtCap(message).substring(11));
             WarnedUser warnedUser = warnedUserService.findByUserId(userId);
             sendTextMessage(warnedUser.getUnbanCount().toString()+warnedUser.getWarnsCount().toString(), 87654811L, null);
         }
@@ -237,7 +237,7 @@ public class BotController extends TelegramLongPollingBot {
                             + "نام گروه:" + "\r\n"
                             + message.getChat().getTitle() + "\r\n"
                             + "متن پیام:" + "\r\n"
-                            + message.getReplyToMessage().getText()
+                            + message.getReplyToMessage().getText() + "\r\n"
                             + "در صورت تکرار اخطار ها از همه ی گروه هایی که این روبات در آن حضور دارد حذف میشوید.";
                     AccessibleUser accessibleUser = accessibleUserService.findByUserId(message.getFrom().getId());
                     if (accessibleUser != null)
