@@ -1,4 +1,4 @@
-package com.mehranghofrani.persian_group_guard_bot.model.dao;
+package com.mehranghofrani.persian_group_guard_bot.model.repository;
 
 import com.mehranghofrani.persian_group_guard_bot.model.entity.AccessibleUser;
 import org.springframework.data.repository.CrudRepository;

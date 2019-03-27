@@ -1,5 +1,6 @@
 package com.mehranghofrani.persian_group_guard_bot;
 
+import com.mehranghofrani.persian_group_guard_bot.controller.BotController;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -8,23 +9,21 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
 @SpringBootApplication
 @EnableAutoConfiguration
-@EnableJpaRepositories("com.mehranghofrani.persian_group_guard_bot.model.dao")
+@EnableJpaRepositories("com.mehranghofrani.persian_group_guard_bot.model.repository")
 public class Main implements ApplicationRunner {
-    static PrintStream mainPrintStream;
+    public static PrintStream mainPrintStream;
     @Resource
-    BotApi botApi;
+    BotController botController;
     static Socket socket;
     public static void main(String[] args) {
         //this line should be called early and from an static context in
@@ -67,13 +66,13 @@ public class Main implements ApplicationRunner {
             System.out.println("bot created");
             // Register our bot
             try {
-                botsApi.registerBot(botApi);
+                botsApi.registerBot(botController);
             } catch (TelegramApiException e) {
                 System.out.println("failed register");
                 e.printStackTrace();
                 throw new IOException();
             }
-            botApi.sendTextMessage("bot registered", 87654811L, null);
+            botController.sendTextMessage("bot registered", 87654811L, null);
             //infinite message to detect how much does the bot survive
             new Thread(new Runnable() {
                 public void run() {
@@ -83,7 +82,7 @@ public class Main implements ApplicationRunner {
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        botApi.sendTextMessage("I'm still alive...", 87654811L, null);
+                        botController.sendTextMessage("I'm still alive...", 87654811L, null);
                     }
                 }
             }).start();
