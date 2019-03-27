@@ -36,7 +36,7 @@ public class Main implements ApplicationRunner {
     public void normalStart() {
         try {
             //checking if running in heroku servers or on my machine
-            if (!System.getenv("connect9150").equals("false")) {
+            if (!System.getenv("ON_LOCAL_MACHINE").equals("false")) {
                 // Setting proxies
 //                System.out.println("https has been set");
 //                System.setProperty("http.proxyHost", "localhost");
