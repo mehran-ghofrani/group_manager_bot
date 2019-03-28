@@ -281,7 +281,7 @@ public class BotController extends TelegramLongPollingBot {
 //        }
 //    }
 
-    private void warn(Message message) throws TelegramApiException {
+    private void warn(Message message) {
         if (getTxtCap(message) != null && getTxtCap(message).equals("warn") && (message.getReplyToMessage() != null)) {
             Message repliedMessage = message.getReplyToMessage();
             long chatId = message.getChat().getId();
@@ -338,7 +338,9 @@ public class BotController extends TelegramLongPollingBot {
                             + "نام گروه:" + "\r\n"
                             + message.getChat().getTitle() + "\r\n"
                             + "متن پیام:" + "\r\n"
-                            + message.getReplyToMessage().getText() + "\r\n"
+                            + (message.getReplyToMessage().getText() != null ?  message.getReplyToMessage().getText() : "بدون متن") + "\r\n"
+                            + "زمان پیام:" + "\r\n"
+                            + new Date(message.getDate()).toString() + "\r\n"
                             + "در صورت تکرار اخطار ها از همه ی گروه هایی که این روبات در آن حضور دارد حذف میشوید.";
                     AccessibleUser accessibleUser = accessibleUserService.findByUserId(message.getReplyToMessage().getFrom().getId());
                     if (accessibleUser != null)
@@ -351,7 +353,11 @@ public class BotController extends TelegramLongPollingBot {
                     kickChatMember.setChatId(message.getChatId());
                     kickChatMember.setUserId(message.getFrom().getId());
                     kickChatMember.setUntilDate(0);
-                    execute(kickChatMember);
+                    try {
+                        execute(kickChatMember);
+                    } catch (TelegramApiException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             deleteMessage(message);
