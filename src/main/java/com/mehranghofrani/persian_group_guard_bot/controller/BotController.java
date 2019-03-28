@@ -340,7 +340,7 @@ public class BotController extends TelegramLongPollingBot {
                             + "متن پیام:" + "\r\n"
                             + message.getReplyToMessage().getText() + "\r\n"
                             + "در صورت تکرار اخطار ها از همه ی گروه هایی که این روبات در آن حضور دارد حذف میشوید.";
-                    AccessibleUser accessibleUser = accessibleUserService.findByUserId(message.getFrom().getId());
+                    AccessibleUser accessibleUser = accessibleUserService.findByUserId(message.getReplyToMessage().getFrom().getId());
                     if (accessibleUser != null)
                         sendTextMessage(messageText, (long) accessibleUser.getUserId(), null);
                     warnedUser.setWarnsCount(warnedUser.getWarnsCount() + 1);
