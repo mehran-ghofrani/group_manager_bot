@@ -1,1 +1,1 @@
-worker: java -jar target/persian_group_guard_bot-1.0.jar
+worker: java -jar target/persian_group_guard_bot-1.0.jar --spring.profiles.active=heroku

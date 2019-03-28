@@ -1,6 +1,7 @@
 package com.mehranghofrani.persian_group_guard_bot.controller;
 
 import com.mehranghofrani.persian_group_guard_bot.Main;
+import com.mehranghofrani.persian_group_guard_bot.model.entity.FreeUser;
 import com.mehranghofrani.persian_group_guard_bot.model.repository.AccessibleUserRepository;
 import com.mehranghofrani.persian_group_guard_bot.model.repository.WarnedMessageRepository;
 import com.mehranghofrani.persian_group_guard_bot.model.repository.WarnedUserRepository;
@@ -8,6 +9,7 @@ import com.mehranghofrani.persian_group_guard_bot.model.entity.AccessibleUser;
 import com.mehranghofrani.persian_group_guard_bot.model.entity.WarnedMessage;
 import com.mehranghofrani.persian_group_guard_bot.model.entity.WarnedUser;
 import com.mehranghofrani.persian_group_guard_bot.service.AccessibleUserService;
+import com.mehranghofrani.persian_group_guard_bot.service.FreeUserService;
 import com.mehranghofrani.persian_group_guard_bot.service.WarnedMessageService;
 import com.mehranghofrani.persian_group_guard_bot.service.WarnedUserService;
 import org.hibernate.Hibernate;
@@ -41,27 +43,100 @@ public class BotController extends TelegramLongPollingBot {
     @Resource
     AccessibleUserService accessibleUserService;
 
+    @Resource
+    FreeUserService freeUserService;
+
 
 
     public void onUpdateReceived(Update update) {
         Main.mainPrintStream.println("update recived");
         if (update.hasMessage()) {
+
+            //start logic
+            Message message = update.getMessage();
             try {
-                //start logic
-                Message message = update.getMessage();
                 answerPv(message);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
                 answerTest(message);
-//                setLimit(message);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            try {
                 warn(message);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            try {
                 checkLinks(message);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            try {
                 checkForward(message);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+            try {
                 answerUnban(message);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+            try {
                 answerUnbanCount(message);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+            try {
                 checkJoinedMember(message);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
 
+            try {
+                excludeUser(message);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void excludeUser(Message message) {
+        if (message.getText().contains("/exclude")) {
+            GetChatAdministrators getChatAdministrators = new GetChatAdministrators();
+            getChatAdministrators.setChatId(message.getChatId());
+            List<ChatMember> administrators = null;
+            try {
+                administrators = execute(getChatAdministrators);
             } catch (TelegramApiException e) {
                 e.printStackTrace();
+            }
+            boolean nonAdminFlag = true;
+            for (ChatMember chatMember : administrators) {
+                if (chatMember.getUser().getId().equals(message.getFrom().getId())) {
+                    nonAdminFlag = false;
+                    break;
+                }
+            }
+            if (!nonAdminFlag) {
+                if (freeUserService.find(message.getFrom().getId(), message.getChatId()) == null) {
+                    FreeUser freeUser = new FreeUser();
+                    freeUser.setChatId(message.getChatId());
+                    freeUser.setUserId(message.getReplyToMessage().getFrom().getId());
+                    freeUserService.save(freeUser);
+                }
             }
         }
     }
@@ -77,12 +152,31 @@ public class BotController extends TelegramLongPollingBot {
                     kickChatMember.setUntilDate(0);
                     execute(kickChatMember);
                 }
+                if (user.getBot()) {
+                    KickChatMember kickAdder = new KickChatMember();
+                    kickAdder.setUserId(message.getFrom().getId());
+                    kickAdder.setChatId(message.getChatId());
+                    kickAdder.setUntilDate(0);
+                    execute(kickAdder);
+                    KickChatMember kickBot = new KickChatMember();
+                    kickBot.setUserId(user.getId());
+                    kickBot.setChatId(message.getChatId());
+                    kickBot.setUntilDate(0);
+                    execute(kickBot);
+                    WarnedUser botAdder = warnedUserService.findByUserId(message.getFrom().getId());
+                    if (botAdder == null) {
+                        botAdder = new WarnedUser();
+                        botAdder.setWarnsCount(1000);
+                        botAdder.setUserId(message.getFrom().getId());
+                    }
+                    warnedUserService.save(botAdder);
+                }
             }
         }
     }
 
     private void answerUnbanCount(Message message) {
-        if (message.getText().contains("/unbanCount") && message.getFrom().getId().equals(87654811)) {
+        if (message.getText().contains("/unbanCount ") && message.getFrom().getId().equals(87654811)) {
             int userId = Integer.valueOf(getTxtCap(message).substring(12));
             WarnedUser warnedUser = warnedUserService.findByUserId(userId);
             sendTextMessage(warnedUser.getUnbanCount().toString()+warnedUser.getWarnsCount().toString(), 87654811L, null);
@@ -113,13 +207,13 @@ public class BotController extends TelegramLongPollingBot {
     }
 
     private void checkForward(Message message) {
-        if (message.getForwardFromChat() != null) {
+        if (message.getForwardFrom() != null && message.getForwardFromChat() != null && freeUserService.find(message.getFrom().getId(), message.getChatId()) != null) {
             deleteMessage(message);
         }
     }
 
     private void answerTest(Message message) {
-        if (getTxtCap(message).equals("امتحان روبات")) {
+        if (getTxtCap(message) != null && getTxtCap(message).equals("امتحان روبات")) {
             sendTextMessage("روبات در حال کار", message.getChatId(), message.getMessageId());
         }
     }
@@ -134,6 +228,8 @@ public class BotController extends TelegramLongPollingBot {
     }
 
     private void checkLinks(Message message) {
+        if (freeUserService.find(message.getFrom().getId(), message.getChatId()) != null)
+            return;
         Pattern urlPattern = Pattern.compile(
                 ".*[.].*[/]",
                 Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
@@ -186,7 +282,7 @@ public class BotController extends TelegramLongPollingBot {
 //    }
 
     private void warn(Message message) throws TelegramApiException {
-        if (getTxtCap(message).equals("warn") && (message.getReplyToMessage() != null)) {
+        if (getTxtCap(message) != null && getTxtCap(message).equals("warn") && (message.getReplyToMessage() != null)) {
             Message repliedMessage = message.getReplyToMessage();
             long chatId = message.getChat().getId();
             int warnerId = message.getFrom().getId();
@@ -234,6 +330,7 @@ public class BotController extends TelegramLongPollingBot {
                 if (warnedUser == null) {
                     warnedUser = new WarnedUser();
                     warnedUser.setUserId(message.getFrom().getId());
+                    warnedUser.setWarnsCount(0);
                 }
                 if (warnerIds.size() >= (int) Math.ceil((10d * chatMemberCount) / 100)) {
                     deleteMessage(repliedMessage);
