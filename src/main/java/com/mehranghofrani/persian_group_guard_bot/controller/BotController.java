@@ -207,8 +207,9 @@ public class BotController extends TelegramLongPollingBot {
     }
 
     private void checkForward(Message message) {
-        if (message.getForwardFrom() != null && message.getForwardFromChat() != null && freeUserService.find(message.getFrom().getId(), message.getChatId()) != null) {
-            deleteMessage(message);
+        if (message.getForwardFromChat() != null)
+            if (freeUserService.find(message.getFrom().getId(), message.getChatId()) == null) {
+                deleteMessage(message);
         }
     }
 
@@ -228,14 +229,13 @@ public class BotController extends TelegramLongPollingBot {
     }
 
     private void checkLinks(Message message) {
-        if (freeUserService.find(message.getFrom().getId(), message.getChatId()) != null)
-            return;
         Pattern urlPattern = Pattern.compile(
                 ".*[.].*[/]",
                 Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
         Matcher matcher = urlPattern.matcher(getTxtCap(message));
         if (matcher.find())
-            deleteMessage(message);
+            if (freeUserService.find(message.getFrom().getId(), message.getChatId()) == null)
+                deleteMessage(message);
     }
 
 //    private void setLimit(Message message) {
