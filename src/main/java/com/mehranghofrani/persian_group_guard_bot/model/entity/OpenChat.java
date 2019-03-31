@@ -3,15 +3,15 @@ package com.mehranghofrani.persian_group_guard_bot.model.entity;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "accessible_user")
-public class AccessibleUser {
+@Table(name = "open_chat")
+public class OpenChat {
 
     @Id
     @GeneratedValue
     Integer id;
 
-    @Column(name = "user_id")
-    Integer userId;
+    @Column(name = "chat_id")
+    Integer chatId;
 
     public Integer getId() {
         return id;
@@ -21,11 +21,11 @@ public class AccessibleUser {
         this.id = id;
     }
 
-    public Integer getUserId() {
-        return userId;
+    public Integer getChatId() {
+        return chatId;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public void setChatId(Integer chatId) {
+        this.chatId = chatId;
     }
 }

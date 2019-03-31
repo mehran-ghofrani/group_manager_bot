@@ -1,6 +1,7 @@
 package com.mehranghofrani.persian_group_guard_bot;
 
-import com.mehranghofrani.persian_group_guard_bot.controller.BotController;
+import com.mehranghofrani.persian_group_guard_bot.controller.bot.BaseBotController;
+import com.mehranghofrani.persian_group_guard_bot.controller.telegram.TelegramBot;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -15,15 +16,15 @@ public class TelegramPrintStream extends PrintStream {
 class TelegramOutputStream extends OutputStream {
     String currentLine;
     @Resource
-    BotController botController;
+    TelegramBot telegramBot;
     public void write(int b) throws IOException {
         if (currentLine == null)
             currentLine = "";
         String outputString = new String(new char[]{(char)b});
-        if (botController != null) {
+        if (telegramBot != null) {
             currentLine = currentLine + outputString;
             if (currentLine.contains("\r")) {
-             botController.sendTextMessage(currentLine, 87654811L, null);
+                telegramBot.sendTextMessage(currentLine, 87654811L, null);
                 currentLine = "";
              }
         }
