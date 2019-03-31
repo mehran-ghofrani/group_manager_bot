@@ -3,8 +3,10 @@ package com.mehranghofrani.persian_group_guard_bot.controller.telegram;
 import com.mehranghofrani.persian_group_guard_bot.controller.bot.BaseBotController;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
+import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -77,5 +79,16 @@ public class TelegramBot extends TelegramLongPollingBot {
     public void replyCurrentMessage(String messageText) {
         Message messageForReply = currentProcessingUpdate.getMessage();
         sendTextMessage(messageText, messageForReply.getChatId(), messageForReply.getMessageId());
+    }
+
+    public Chat findChat(Long chatId) {
+        GetChat getChat = new GetChat();
+        getChat.setChatId(chatId);
+        try {
+            return execute(getChat);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

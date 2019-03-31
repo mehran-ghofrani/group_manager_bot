@@ -6,7 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Component
-public class OpenChatController extends BaseBotController {
+public class AnyMessageController extends BaseBotController {
     @Override
     protected boolean isHandlable(Update update) {
         if (!update.hasMessage())
