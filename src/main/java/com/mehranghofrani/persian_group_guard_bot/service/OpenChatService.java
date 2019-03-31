@@ -11,8 +11,8 @@ public class OpenChatService {
     @Resource
     OpenChatRepository openChatRepository;
 
-    public OpenChat findByUserId(Integer id) {
-        return openChatRepository.findByUserId(id);
+    public OpenChat find(Long id) {
+        return openChatRepository.findByChatId(id);
     }
 
     public OpenChat save(OpenChat openChat) {

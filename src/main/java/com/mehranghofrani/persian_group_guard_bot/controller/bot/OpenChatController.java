@@ -17,9 +17,9 @@ public class OpenChatController extends BaseBotController {
     @Override
     protected void handle(Update update) {
         Message message = update.getMessage();
-        if (openChatService.findByUserId(message.getFrom().getId()) == null) {
+        if (openChatService.find(message.getChatId()) == null) {
             OpenChat savingOpenChat = new OpenChat();
-            savingOpenChat.setChatId(message.getFrom().getId());
+            savingOpenChat.setChatId(message.getChatId());
             openChatService.save(savingOpenChat);
         }
 

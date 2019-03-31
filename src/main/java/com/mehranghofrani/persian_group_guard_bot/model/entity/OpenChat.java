@@ -11,7 +11,7 @@ public class OpenChat {
     Integer id;
 
     @Column(name = "chat_id")
-    Integer chatId;
+    Long chatId;
 
     public Integer getId() {
         return id;
@@ -21,11 +21,11 @@ public class OpenChat {
         this.id = id;
     }
 
-    public Integer getChatId() {
+    public Long getChatId() {
         return chatId;
     }
 
-    public void setChatId(Integer chatId) {
+    public void setChatId(Long chatId) {
         this.chatId = chatId;
     }
 }

@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface OpenChatRepository extends CrudRepository<OpenChat, Integer> {
-    OpenChat findByChatId(Integer chatId);
+    OpenChat findByChatId(Long chatId);
 
 }

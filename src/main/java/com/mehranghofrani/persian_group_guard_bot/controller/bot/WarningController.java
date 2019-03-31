@@ -97,7 +97,7 @@ public class WarningController extends BaseBotController {
                         + "زمان پیام:" + "\r\n"
                         + new Date(message.getDate()).toString() + "\r\n"
                         + "در صورت تکرار اخطار ها از همه ی گروه هایی که این روبات در آن حضور دارد حذف میشوید.";
-                OpenChat openChat = openChatService.findByUserId(message.getReplyToMessage().getFrom().getId());
+                OpenChat openChat = openChatService.find((long) message.getReplyToMessage().getFrom().getId());
                 if (openChat != null)
                     telegramBot.sendTextMessage(messageText, (long) openChat.getChatId(), null);
                 warnedUser.setWarnsCount(warnedUser.getWarnsCount() + 1);
