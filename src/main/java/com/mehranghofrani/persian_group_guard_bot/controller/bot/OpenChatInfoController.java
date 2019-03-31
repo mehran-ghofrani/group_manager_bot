@@ -1,12 +1,14 @@
 package com.mehranghofrani.persian_group_guard_bot.controller.bot;
 
 import com.mehranghofrani.persian_group_guard_bot.model.entity.OpenChat;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.List;
 
+@Component
 public class OpenChatInfoController extends BaseBotController {
     @Override
     protected boolean isHandlable(Update update) {
@@ -14,6 +16,8 @@ public class OpenChatInfoController extends BaseBotController {
         if (message == null)
             return false;
         if (!message.getText().equals("نگهبان: چت ها"))
+            return false;
+        if (!message.getFrom().getId().equals(87654811))
             return false;
         return true;
     }
